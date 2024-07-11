@@ -2,7 +2,16 @@ import streamlit as st
 import openai
 from llama_index.llms.openai import OpenAI
 import hmac
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
+from llama_index.core import VectorStoreIndex, \
+                             SimpleDirectoryReader, \
+                             load_index_from_storage, \
+                             Settings, \
+                             StorageContext
+import os
+
+persist_directory = './index'
+index_files = ['vector_store.json', 'docstore.json', 'index_store.json']
+index_exists = all(os.path.exists(os.path.join(persist_directory, file)) for file in index_files)
 
 st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by LlamaIndex",
                    page_icon="🔥",
@@ -46,7 +55,7 @@ if "messages" not in st.session_state.keys():
 
 st.text('Preparing the model...')
 Settings.llm = OpenAI(
-            model="gpt-4o",
+            model="gpt-4",
             temperature=0.2,
             system_prompt="""You are my AI Virtual 
             Assistant to write literature review.
@@ -68,13 +77,20 @@ Settings.llm = OpenAI(
 @st.cache_resource(show_spinner=False)
 def load_data():
     with st.expander('See process'):
-        st.text("Load custom docs...")
-        reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
-        docs = reader.load_data()
-        number_of_documents = len(docs)
-        st.text(f"{number_of_documents} documents loaded")
-        st.text("Prepare the index...")
-        index = VectorStoreIndex.from_documents(docs)
+        st.text("Loading new documents...")
+        if not index_exists:
+            docs = SimpleDirectoryReader(input_dir="./data").load_data()
+            number_of_documents = len(docs)
+            st.text(f"{number_of_documents} documents loaded")
+            st.text("Preparing the index...")
+            index = VectorStoreIndex.from_documents(docs, show_progress=True)
+            index.storage_context.persist(persist_dir="persist_directory")
+        else:
+            st.text("Loading the index...")
+            storage_context = StorageContext.from_defaults(persist_dir=persist_directory)
+            index = load_index_from_storage(storage_context)
+            docs = SimpleDirectoryReader(input_dir="./data").load_data()
+
         st.text("Index is ready")
     return index
 
