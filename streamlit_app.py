@@ -24,8 +24,8 @@ def get_academic_papers_from_dblp(query: str):
     for feed in feeds:
         feeds_summary.append(
             Document(
-                text=feed['title'],
-                metadata={"author": feed["info"], "score": feed['@score']},
+                text=feed['info']['title'],
+                metadata={"author": feed["info"]['authors'][0]['text'], "score": feed['@score']},
             )
     )
     return feeds_summary
