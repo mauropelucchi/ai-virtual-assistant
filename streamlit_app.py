@@ -18,7 +18,7 @@ def get_academic_papers_from_dblp(query: str):
     feeds_summary = []
     url = f'https://dblp.org/search/publ/api?q={query}&format=json'
     response = requests.get(url)
-    os.write(1,response.text)
+    st.text(response.text)
     data = response.json()
     feeds = data["result"]["hits"]["hit"]
     for feed in feeds:
