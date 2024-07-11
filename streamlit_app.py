@@ -144,15 +144,15 @@ if st.session_state.messages[-1]["role"] != "assistant":
             Generate a list of relevant terms (max 10) to
             retrieve relevant documents
             format of the output:
-            term 1\n
-            term 2\n
-            term 3\n
+            term 1####
+            term 2####
+            term 3####
         """)
         response_text = ""
         for token in response.response_gen:
             response_text = response_text + " " + token
         parser = SimpleNodeParser()
-        for response in response_text.split('\n'):
+        for response in response_text.split('####'):
             print(f"Downloading new relevant documents about {response}...")
             new_documents = get_academic_papers_from_dblp(response)
             print("Adding new docs to the existing index...")
