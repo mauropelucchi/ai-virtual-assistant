@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 from llama_index.llms.openai import OpenAI
 import hmac
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
+from llama_index.core import PropertyGraphIndex, SimpleDirectoryReader, Settings
 
 st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by LlamaIndex",
                    page_icon="🔥",
@@ -55,6 +55,13 @@ Settings.llm = OpenAI(
             your answers technical, academic 
             languages and based on 
             facts – do not hallucinate features.
+            Template of the literature review:
+            Introductiom
+            State of the art
+            add here the ad-hoc paragraph
+            References
+
+            Important: use an academic languages
             """,
 )
 
@@ -62,12 +69,12 @@ Settings.llm = OpenAI(
 def load_data():
     with st.expander('See process'):
         st.text("Load custom docs...")
-        reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
+        reader = SimpleDirectoryReader(input_dir="./data", recursive=True, num_workers=4)
         docs = reader.load_data()
         number_of_documents = len(docs)
         st.text(f"{number_of_documents} documents loaded")
         st.text("Prepare the index...")
-        index = VectorStoreIndex.from_documents(docs)
+        index = PropertyGraphIndex.from_documents(docs)
         st.text("Index is ready")
     return index
 
