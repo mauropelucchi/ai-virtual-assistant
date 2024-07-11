@@ -14,7 +14,7 @@ from llama_index.core import VectorStoreIndex, \
 import os
 
 def get_academic_papers_from_dblp(query: str):
-    query = query.replace("* ", "").replace(" ", "+")
+    query = query.replace("\\* ", "").replace(" ", "+")
     feeds_summary = []
     url = f'https://dblp.org/search/publ/api?q={query}&format=json'
     response = requests.get(url)
