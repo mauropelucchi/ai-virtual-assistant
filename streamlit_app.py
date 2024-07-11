@@ -61,6 +61,9 @@ def check_password():
 
 if not check_password():
     st.stop()
+st.subheader("Welcome to the AI Virtual Assistant for Literature Review")
+st.text("The assistant is based on https://dblp.org/")
+st.text("Example of prompts:")
 
 openai.api_key = st.secrets.openai_key
 
@@ -135,16 +138,16 @@ for message in st.session_state.messages:  # Write message history to UI
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         responses = st.session_state.chat_engine.chat("""
-            Generate a list of relevant queries (max 10) to
+            Generate a list of relevant terms (max 10) to
             retrieve relevant documents
             format of the output:
-            query 1
-            query 2
-            query 3
+            term 1\n
+            term 2\n
+            term 3\n
         """)
         for response in responses.split('\n'):
-            print(f"Donwloading new relevant documents about {response}...")
-            new_documents = get_academic_papers_from_dblp(response)
+            print(f"Donwloading new relevant documents about {response.chat_stream}...")
+            new_documents = get_academic_papers_from_dblp(response.chat_stream)
             print("Adding new docs to the existing index...")
             index.insert_nodes(new_documents)
         response_stream = st.session_state.chat_engine.stream_chat(prompt)
