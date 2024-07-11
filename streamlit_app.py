@@ -3,7 +3,11 @@ import openai
 from llama_index.llms.openai import OpenAI
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 
-st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by LlamaIndex", page_icon="🦙", layout="centered", initial_sidebar_state="auto", menu_items=None)
+st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by LlamaIndex",
+                   page_icon="",
+                   layout="centered",
+                   initial_sidebar_state="auto",
+                   menu_items=None)
 openai.api_key = st.secrets.openai_key
 st.title("AI Virtual Assistant")
 
@@ -17,15 +21,17 @@ if "messages" not in st.session_state.keys():
 
 st.text('Preparing the model...')
 Settings.llm = OpenAI(
-            model="gpt-4",
-            temperature=0.1,
+            model="gpt-4o",
+            temperature=0.2,
+            max_tokens=127000,
             system_prompt="""You are my AI Virtual 
             Assistant to write literature review.
             Assume that all questions are related 
             to the science and economics. Keep 
             your answers technical, academic 
             languages and based on 
-            facts – do not hallucinate features.""",
+            facts – do not hallucinate features.
+            """,
 )
 
 @st.cache_resource(show_spinner=False)
