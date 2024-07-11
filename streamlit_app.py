@@ -16,26 +16,28 @@ import os
 def get_academic_papers_from_dblp(query: str):
     query = query.replace(" ", "+")
     feeds_summary = []
-    url = f'https://dblp.org/search/publ/api?q={query}&format=json'
-    response = requests.get(url)
-    st.text(response.text)
-    data = response.json()
-    hits = data["result"]["hits"]["hit"]
-    for hit in hits:
-        authors = ""
-        author_info = hit["info"]["authors"]["author"]
-        if isinstance(author_info, list):
-            for author in author_info:
-                authors = authors + "," + author["text"]
-        else:
-            authors = author_info["text"]
-                
-        feeds_summary.append(
-            Document(
-                text=hit['info']['title'],
-                metadata={"author": authors, "score": hit['@score']},
-            )
-    )
+    try:
+        url = f'https://dblp.org/search/publ/api?q={query}&format=json'
+        response = requests.get(url)
+        data = response.json()
+        hits = data["result"]["hits"]["hit"]
+        for hit in hits:
+            authors = ""
+            author_info = hit["info"]["authors"]["author"]
+            if isinstance(author_info, list):
+                for author in author_info:
+                    authors = authors + "," + author["text"]
+            else:
+                authors = author_info["text"]
+                    
+            feeds_summary.append(
+                Document(
+                    text=hit['info']['title'],
+                    metadata={"author": authors, "score": hit['@score']},
+                )
+        )
+    except:
+        pass
     return feeds_summary
 
 persist_directory = './index'
