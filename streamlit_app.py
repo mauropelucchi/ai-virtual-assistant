@@ -15,26 +15,32 @@ if "messages" not in st.session_state.keys():
         }
     ]
 
+st.subheader('Loading your data...')
+Settings.llm = OpenAI(
+            model="gpt-3.5-turbo",
+            temperature=0.2,
+            system_prompt="""You are my AI Virtual 
+            Assistant to write literature review.
+            Assume that all questions are related 
+            to the science and economics. Keep 
+            your answers technical, academic 
+            languages and based on 
+            facts – do not hallucinate features.""",
+)
+
 @st.cache_resource(show_spinner=False)
 def load_data():
-    reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
-    docs = reader.load_data()
-    Settings.llm = OpenAI(
-        model="gpt-3.5-turbo",
-        temperature=0.2,
-        system_prompt="""You are my AI Virtual 
-        Assistant to write literature review.
-        Assume that all questions are related 
-        to the science and economics. Keep 
-        your answers technical, academic 
-        languages and based on 
-        facts – do not hallucinate features.""",
-    )
-    index = VectorStoreIndex.from_documents(docs)
+    with st.expander('See process'):
+        st.text("Load custom docs...")
+        reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
+        docs = reader.load_data()
+        st.text("Prepare the index...")
+        index = VectorStoreIndex.from_documents(docs)
     return index
 
-
+st.subheader('Loading your data...')
 index = load_data()
+st.subheader('Preparing the engine...')
 
 if "chat_engine" not in st.session_state.keys():  # Initialize the chat engine
     st.session_state.chat_engine = index.as_chat_engine(
