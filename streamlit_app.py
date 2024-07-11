@@ -1,6 +1,5 @@
 import streamlit as st
 import openai
-st.text("Prepare the index...")
 from llama_index.llms.openai import OpenAI
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 
