@@ -20,16 +20,20 @@ def get_academic_papers_from_dblp(query: str):
     response = requests.get(url)
     st.text(response.text)
     data = response.json()
-    feeds = data["result"]["hits"]["hit"]
-    for feed in feeds:
+    hits = data["result"]["hits"]["hit"]
+    for hit in hits:
         authors = ""
-        for author in feed["info"]['authors']["author"]:
-            authors = authors + ", " + author["text"]
+        author_info = hit["info"]["authors"]["author"]
+        if isinstance(author_info, list):
+            for author in author_info:
+                authors.append(author["text"])
+        else:
+            authors.append(author_info["text"])
                 
         feeds_summary.append(
             Document(
-                text=feed['info']['title'],
-                metadata={"author": authors, "score": feed['@score']},
+                text=hit['info']['title'],
+                metadata={"author": authors, "score": hit['@score']},
             )
     )
     return feeds_summary
