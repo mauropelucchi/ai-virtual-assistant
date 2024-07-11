@@ -15,7 +15,7 @@ if "messages" not in st.session_state.keys():
         }
     ]
 
-st.subheader('Loading your data...')
+st.text('Preparing the model...')
 Settings.llm = OpenAI(
             model="gpt-3.5-turbo",
             temperature=0.2,
@@ -38,14 +38,16 @@ def load_data():
         index = VectorStoreIndex.from_documents(docs)
     return index
 
-st.subheader('Loading your data...')
+st.text('Loading your data...')
 index = load_data()
-st.subheader('Preparing the engine...')
+st.text('Preparing the engine...')
 
 if "chat_engine" not in st.session_state.keys():  # Initialize the chat engine
     st.session_state.chat_engine = index.as_chat_engine(
         chat_mode="condense_question", verbose=True, streaming=True
     )
+
+st.text('Ready...')
 
 if prompt := st.chat_input(
     "Ask a question"
