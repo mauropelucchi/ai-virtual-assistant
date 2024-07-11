@@ -23,7 +23,6 @@ st.text('Preparing the model...')
 Settings.llm = OpenAI(
             model="gpt-4o",
             temperature=0.2,
-            max_tokens=127000,
             system_prompt="""You are my AI Virtual 
             Assistant to write literature review.
             Assume that all questions are related 
