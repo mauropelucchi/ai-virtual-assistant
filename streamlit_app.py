@@ -137,7 +137,7 @@ for message in st.session_state.messages:  # Write message history to UI
 # If last message is not from assistant, generate a new response
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
-        response = st.session_state.chat_engine.chat("""
+        response = st.session_state.chat_engine.stream_chat("""
             Generate a list of relevant terms (max 10) to
             retrieve relevant documents
             format of the output:
