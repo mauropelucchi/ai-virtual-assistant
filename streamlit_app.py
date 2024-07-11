@@ -26,9 +26,9 @@ def get_academic_papers_from_dblp(query: str):
         author_info = hit["info"]["authors"]["author"]
         if isinstance(author_info, list):
             for author in author_info:
-                authors.append(author["text"])
+                authors = authors + "," + author["text"])
         else:
-            authors.append(author_info["text"])
+            authors = author_info["text"]
                 
         feeds_summary.append(
             Document(
