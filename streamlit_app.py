@@ -14,7 +14,7 @@ from llama_index.core import VectorStoreIndex, \
 import os
 
 def get_academic_papers_from_dblp(query: str):
-    query = query.replace("\\* ", "").replace(" ", "+")
+    query = query.replace(" ", "+")
     feeds_summary = []
     url = f'https://dblp.org/search/publ/api?q={query}&format=json'
     response = requests.get(url)
@@ -150,7 +150,7 @@ if st.session_state.messages[-1]["role"] != "assistant":
             """)
             response_text = ""
             for token in response.response_gen:
-                response_text = response_text + " " + token
+                response_text = response_text + token
             parser = SimpleNodeParser()
             for response in response_text.split('####'):
                 st.text(f"Downloading new relevant documents about {response}...")
