@@ -20,6 +20,7 @@ def get_academic_papers_from_dblp(query: str):
     try:
         response = requests.get(url)
         data = response.json()
+        os.write(1,data.text)
         feeds = data["result"]["hits"]["hit"]
         for feed in feeds:
             feeds_summary.append(
@@ -140,23 +141,24 @@ for message in st.session_state.messages:  # Write message history to UI
 # If last message is not from assistant, generate a new response
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
-        response = st.session_state.chat_engine.stream_chat("""
-            Generate a list of relevant terms (max 10) to
-            retrieve relevant documents
-            format of the output:
-            term 1####
-            term 2####
-            term 3####
-        """)
-        response_text = ""
-        for token in response.response_gen:
-            response_text = response_text + " " + token
-        parser = SimpleNodeParser()
-        for response in response_text.split('####'):
-            print(f"Downloading new relevant documents about {response}...")
-            new_documents = get_academic_papers_from_dblp(response)
-            print("Adding new docs to the existing index...")
-            index.insert_nodes(parser.get_nodes_from_documents(new_documents))
+        with st.expander('See process'):
+            response = st.session_state.chat_engine.stream_chat("""
+                Generate a list of relevant terms (max 10) to
+                retrieve relevant documents
+                format of the output:
+                term 1####
+                term 2####
+                term 3####
+            """)
+            response_text = ""
+            for token in response.response_gen:
+                response_text = response_text + " " + token
+            parser = SimpleNodeParser()
+            for response in response_text.split('####'):
+                st.text(f"Downloading new relevant documents about {response}...")
+                new_documents = get_academic_papers_from_dblp(response)
+                st.text("Adding new docs to the existing index...")
+                index.insert_nodes(parser.get_nodes_from_documents(new_documents))
         response_stream = st.session_state.chat_engine.stream_chat(prompt)
         st.write_stream(response_stream.response_gen)
         message = {"role": "assistant", "content": response_stream.response}
