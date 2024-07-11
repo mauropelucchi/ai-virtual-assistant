@@ -1,5 +1,6 @@
 import streamlit as st
 import openai
+st.text("Prepare the index...")
 from llama_index.llms.openai import OpenAI
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 
@@ -17,8 +18,8 @@ if "messages" not in st.session_state.keys():
 
 st.text('Preparing the model...')
 Settings.llm = OpenAI(
-            model="gpt-3.5-turbo",
-            temperature=0.2,
+            model="gpt-4",
+            temperature=0.1,
             system_prompt="""You are my AI Virtual 
             Assistant to write literature review.
             Assume that all questions are related 
