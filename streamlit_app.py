@@ -8,8 +8,7 @@ from llama_index.core import VectorStoreIndex, \
                              SimpleDirectoryReader, \
                              load_index_from_storage, \
                              Settings, \
-                             StorageContext, \
-                             SimpleNodeParser
+                             StorageContext
 import os
 
 def get_academic_papers_from_dblp(query: str):
