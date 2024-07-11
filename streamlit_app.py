@@ -76,6 +76,7 @@ st.subheader("Welcome to the AI Virtual Assistant for Literature Review")
 st.text("The assistant is based on https://dblp.org/")
 st.text("Example of prompts:")
 st.text("prepare literature review on labour market and artificial intelligence")
+st.text("prepare literature review on gpt and virtual assistant")
 
 openai.api_key = st.secrets.openai_key
 
