@@ -65,11 +65,8 @@ Settings.llm = OpenAI(
             languages and based on 
             facts – do not hallucinate features.
             Template of the literature review:
-            Introductiom
-            State of the art
-            add here the ad-hoc paragraph
-            References
-
+            Important: add an Introduction session
+            Important: References
             Important: use an academic languages
             """,
 )
@@ -77,8 +74,8 @@ Settings.llm = OpenAI(
 @st.cache_resource(show_spinner=False)
 def load_data():
     with st.expander('See process'):
-        st.text("Loading new documents...")
         if not index_exists:
+            st.text("Loading new documents...")
             docs = SimpleDirectoryReader(input_dir="./data").load_data()
             number_of_documents = len(docs)
             st.text(f"{number_of_documents} documents loaded")
