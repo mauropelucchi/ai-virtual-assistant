@@ -137,7 +137,7 @@ for message in st.session_state.messages:  # Write message history to UI
 # If last message is not from assistant, generate a new response
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
-        responses = st.session_state.chat_engine.chat("""
+        response = st.session_state.chat_engine.chat("""
             Generate a list of relevant terms (max 10) to
             retrieve relevant documents
             format of the output:
@@ -145,7 +145,11 @@ if st.session_state.messages[-1]["role"] != "assistant":
             term 2\n
             term 3\n
         """)
-        for response in responses.chat_stream.split('\n'):
+        response_text = ""
+        for token in response.response_gen:
+            response_text = response_text + " " + token
+        
+        for response in response_text.split('\n'):
             print(f"Downloading new relevant documents about {response}...")
             new_documents = get_academic_papers_from_dblp(response)
             print("Adding new docs to the existing index...")
