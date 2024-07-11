@@ -136,7 +136,9 @@ for message in st.session_state.messages:  # Write message history to UI
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         response = st.session_state.chat_engine.chat("generate a relevant queries to retrive academic article")
+        print(f"Donwloading new relevant documents about {response}...")
         new_documents = get_academic_papers_from_dblp(response)
+
         print("Adding new docs to the existing index...")
         index.insert_nodes(new_documents)
         response_stream = st.session_state.chat_engine.stream_chat(prompt)
