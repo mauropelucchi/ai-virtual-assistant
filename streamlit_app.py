@@ -1,13 +1,34 @@
 import streamlit as st
 import openai
+import requests
+import json
 from llama_index.llms.openai import OpenAI
 import hmac
 from llama_index.core import VectorStoreIndex, \
                              SimpleDirectoryReader, \
                              load_index_from_storage, \
                              Settings, \
-                             StorageContext
+                             StorageContext, \
+                             SimpleNodeParser
 import os
+
+def get_academic_papers_from_dblp(query: str):
+    query = query.replace(" ", "+")
+    feeds_summary = ""
+    url = f'https://dblp.org/search/publ/api?q={query}&format=json'
+    try:
+        response = requests.get(url)
+        data = response.json()
+        feeds = data["result"]["hits"]["hit"]
+        feeds_summary = "\n".join(
+            [
+                f"Relevant paper: {f['info']['title']}. relevant score: {f['@score']}"
+                for f in feeds
+            ]
+        )
+    except:
+        pass
+    return feeds_summary
 
 persist_directory = './index'
 index_files = ['vector_store.json', 'docstore.json', 'index_store.json']
@@ -114,8 +135,11 @@ for message in st.session_state.messages:  # Write message history to UI
 # If last message is not from assistant, generate a new response
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
+        response = st.session_state.chat_engine.chat("generate a relevant queries to retrive academic article")
+        new_documents = get_academic_papers_from_dblp(response)
+        print("Adding new docs to the existing index...")
+        index.insert_nodes(new_documents)
         response_stream = st.session_state.chat_engine.stream_chat(prompt)
         st.write_stream(response_stream.response_gen)
         message = {"role": "assistant", "content": response_stream.response}
-        # Add response to message history
         st.session_state.messages.append(message)
