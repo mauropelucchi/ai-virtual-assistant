@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 from llama_index.llms.openai import OpenAI
 import hmac
-from llama_index.core import PropertyGraphIndex, SimpleDirectoryReader, Settings
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 
 st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by LlamaIndex",
                    page_icon="🔥",
@@ -74,7 +74,7 @@ def load_data():
         number_of_documents = len(docs)
         st.text(f"{number_of_documents} documents loaded")
         st.text("Prepare the index...")
-        index = PropertyGraphIndex.from_documents(docs)
+        index = VectorStoreIndex.from_documents(docs)
         st.text("Index is ready")
     return index
 
