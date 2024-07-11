@@ -4,26 +4,29 @@ import requests
 import json
 from llama_index.llms.openai import OpenAI
 import hmac
+from llama_index.core.node_parser import SimpleNodeParser
 from llama_index.core import VectorStoreIndex, \
                              SimpleDirectoryReader, \
                              load_index_from_storage, \
                              Settings, \
-                             StorageContext
+                             StorageContext, \
+                             Document
 import os
 
 def get_academic_papers_from_dblp(query: str):
     query = query.replace(" ", "+")
-    feeds_summary = ""
+    feeds_summary = []
     url = f'https://dblp.org/search/publ/api?q={query}&format=json'
     try:
         response = requests.get(url)
         data = response.json()
         feeds = data["result"]["hits"]["hit"]
-        feeds_summary = "\n".join(
-            [
-                f"Relevant paper: {f['info']['title']}. relevant score: {f['@score']}"
-                for f in feeds
-            ]
+        for feed in feeds:
+            feeds_summary.append(
+                Document(
+                    text=feed['title'],
+                    metadata={"author": feed["info"], "score": feed['@score']},
+                )
         )
     except:
         pass
@@ -148,12 +151,12 @@ if st.session_state.messages[-1]["role"] != "assistant":
         response_text = ""
         for token in response.response_gen:
             response_text = response_text + " " + token
-        
+        parser = SimpleNodeParser()
         for response in response_text.split('\n'):
             print(f"Downloading new relevant documents about {response}...")
             new_documents = get_academic_papers_from_dblp(response)
             print("Adding new docs to the existing index...")
-            index.insert_nodes(new_documents)
+            index.insert_nodes(parser.get_nodes_from_documents(new_documents))
         response_stream = st.session_state.chat_engine.stream_chat(prompt)
         st.write_stream(response_stream.response_gen)
         message = {"role": "assistant", "content": response_stream.response}
