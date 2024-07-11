@@ -134,12 +134,19 @@ for message in st.session_state.messages:  # Write message history to UI
 # If last message is not from assistant, generate a new response
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
-        response = st.session_state.chat_engine.chat("generate a relevant queries to retrive academic article")
-        print(f"Donwloading new relevant documents about {response}...")
-        new_documents = get_academic_papers_from_dblp(response)
-
-        print("Adding new docs to the existing index...")
-        index.insert_nodes(new_documents)
+        responses = st.session_state.chat_engine.chat("""
+            Generate a list of relevant queries (max 10) to
+            retrieve relevant documents
+            format of the output:
+            query 1
+            query 2
+            query 3
+        """)
+        for response in responses.split('\n'):
+            print(f"Donwloading new relevant documents about {response}...")
+            new_documents = get_academic_papers_from_dblp(response)
+            print("Adding new docs to the existing index...")
+            index.insert_nodes(new_documents)
         response_stream = st.session_state.chat_engine.stream_chat(prompt)
         st.write_stream(response_stream.response_gen)
         message = {"role": "assistant", "content": response_stream.response}
