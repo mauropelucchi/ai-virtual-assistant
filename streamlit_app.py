@@ -23,11 +23,8 @@ def get_academic_papers_from_dblp(query: str):
     feeds = data["result"]["hits"]["hit"]
     for feed in feeds:
         authors = ""
-        if len(feed["info"]['authors']["author"]) > 0:
-            authors = feed["info"]['authors']["author"]['text']
-        else:
-            for author in feed["info"]['authors']["author"]:
-                authors = authors + ", " + author["text"]
+        for author in feed["info"]['authors']["author"]:
+            authors = authors + ", " + author["text"]
                 
         feeds_summary.append(
             Document(
