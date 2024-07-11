@@ -1,6 +1,7 @@
 import streamlit as st
 import openai
 from llama_index.llms.openai import OpenAI
+import hmac
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 
 st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by LlamaIndex",
@@ -8,8 +9,32 @@ st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by L
                    layout="centered",
                    initial_sidebar_state="auto",
                    menu_items=None)
-openai.api_key = st.secrets.openai_key
+
 st.title("AI Virtual Assistant")
+
+def check_password():
+
+    def password_entered():
+        if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # Don't store the password.
+        else:
+            st.session_state["password_correct"] = False
+    if st.session_state.get("password_correct", False):
+        return True
+
+    st.text_input(
+        "Password", type="password", on_change=password_entered, key="password"
+    )
+    if "password_correct" in st.session_state:
+        st.error("😕 Password incorrect")
+    return False
+
+if not check_password():
+    st.stop()
+
+openai.api_key = st.secrets.openai_key
+
 
 if "messages" not in st.session_state.keys():
     st.session_state.messages = [
