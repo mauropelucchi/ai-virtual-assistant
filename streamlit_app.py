@@ -69,7 +69,7 @@ Settings.llm = OpenAI(
 def load_data():
     with st.expander('See process'):
         st.text("Load custom docs...")
-        reader = SimpleDirectoryReader(input_dir="./data", recursive=True, num_workers=4)
+        reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
         docs = reader.load_data()
         number_of_documents = len(docs)
         st.text(f"{number_of_documents} documents loaded")
