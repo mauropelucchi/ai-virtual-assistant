@@ -145,9 +145,9 @@ if st.session_state.messages[-1]["role"] != "assistant":
             term 2\n
             term 3\n
         """)
-        for response in responses.split('\n'):
-            print(f"Donwloading new relevant documents about {response.chat_stream}...")
-            new_documents = get_academic_papers_from_dblp(response.chat_stream)
+        for response in responses.chat_stream.split('\n'):
+            print(f"Downloading new relevant documents about {response}...")
+            new_documents = get_academic_papers_from_dblp(response)
             print("Adding new docs to the existing index...")
             index.insert_nodes(new_documents)
         response_stream = st.session_state.chat_engine.stream_chat(prompt)
