@@ -34,8 +34,11 @@ def load_data():
         st.text("Load custom docs...")
         reader = SimpleDirectoryReader(input_dir="./data", recursive=True)
         docs = reader.load_data()
+        number_of_documents = len(docs)
+        st.text(f"{number_of_documents} documents loaded")
         st.text("Prepare the index...")
         index = VectorStoreIndex.from_documents(docs)
+        st.text("Index is ready")
     return index
 
 st.text('Loading your data...')
