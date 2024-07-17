@@ -108,10 +108,6 @@ def load_data(my_folder):
     return index
 
 with st.sidebar:
-    st.title(":outbox_tray: Upload your documents")
-
-    
-    st.markdown(html_temp.format("rgba(55, 53, 47, 0.16)"),unsafe_allow_html=True)
     st.markdown("""
     # How does it work?
     Upload your documents and prompt your research topics
