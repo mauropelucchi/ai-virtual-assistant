@@ -106,28 +106,6 @@ st.text("The assistant is based on https://dblp.org/")
 
 openai.api_key = st.secrets.openai_key
 
-@st.cache_resource(show_spinner=False)
-def load_data(my_folder):
-    st.text('Loading your data...')
-    print(my_folder)
-    with st.expander('See process'):
-        if not index_exists:
-            st.text("Loading new documents...")
-            docs = SimpleDirectoryReader(input_dir=my_folder).load_data()
-            number_of_documents = len(docs)
-            st.text(f"{number_of_documents} documents loaded")
-            st.text("Preparing the index...")
-            index = VectorStoreIndex.from_documents(docs, show_progress=True)
-            index.storage_context.persist(persist_dir="persist_directory")
-        else:
-            st.text("Loading the index...")
-            storage_context = StorageContext.from_defaults(persist_dir=persist_directory)
-            index = load_index_from_storage(storage_context)
-            docs = SimpleDirectoryReader(input_dir=my_folder).load_data()
-
-        st.text("Index is ready")
-    return index
-
 with st.sidebar:
     st.markdown("""
     # How does it work?
@@ -193,6 +171,7 @@ Settings.llm = OpenAI(
             Important: add an Introduction session
             Important: References
             Important: use an academic languages
+            Use all the documents in the index.
             """,
 )
 
@@ -235,7 +214,11 @@ if st.session_state.messages[-1]["role"] != "assistant":
                     new_documents.extend(get_arxiv_documents(response))
                     st.text("Adding new docs to the existing index...")
                     index.insert_nodes(parser.get_nodes_from_documents(new_documents))
+                st.text("Index is ready")
             response_stream = st.session_state.chat_engine.stream_chat(prompt)
             st.write_stream(response_stream.response_gen)
             message = {"role": "assistant", "content": response_stream.response}
             st.session_state.messages.append(message)
+    else:
+        st.text("Upload your documents to start the process")
+
