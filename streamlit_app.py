@@ -1,5 +1,5 @@
 import streamlit as st
-import pdfminer.high_level
+import pymupdf
 import tempfile
 import pathlib
 import openai
@@ -111,7 +111,10 @@ def load_data(my_folder):
 
 @st.cache_data
 def convert_pdf_to_txt_file(path):
-    return extract_text(path)
+    text = ""
+    doc = pymupdf.open(path)
+    for page in doc:
+        text = text + "\n" + page.get_text()
 
 temp_dir = tempfile.TemporaryDirectory()
 

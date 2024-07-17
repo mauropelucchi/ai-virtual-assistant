@@ -1,6 +1,6 @@
 streamlit
 openai
-pdfminer-six==20240706
+PyMuPDF
 llama-index
 llama-index-llms-openai
 nltk
