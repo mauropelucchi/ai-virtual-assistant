@@ -146,11 +146,6 @@ with st.sidebar:
             else:
                 index.insert_nodes(parser.get_nodes_from_documents(new_documents))
 
-
-# st.write(temp_dir.name)
-index = None
-
-
 if "messages" not in st.session_state.keys():
     st.session_state.messages = [
         {
