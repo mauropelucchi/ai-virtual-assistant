@@ -1,4 +1,5 @@
 import streamlit as st
+import pdfminer
 from pdfminer.high_level import extract_text
 import tempfile
 import pathlib
