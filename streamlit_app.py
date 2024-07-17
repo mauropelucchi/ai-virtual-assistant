@@ -1,8 +1,5 @@
 import streamlit as st
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
+from pdfminer.high_level import extract_text
 from io import StringIO
 import tempfile
 import pathlib
@@ -113,28 +110,9 @@ def load_data(my_folder):
         st.text("Index is ready")
     return index
 
-# https://github.com/nainiayoub/pdf-text-data-extractor/blob/main/functions.py
 @st.cache_data
 def convert_pdf_to_txt_file(path):
-    texts = []
-    rsrcmgr = PDFResourceManager()
-    retstr = StringIO()
-    laparams = LAParams()
-    device = TextConverter(rsrcmgr, retstr, laparams=laparams)
-    # fp = open(path, 'rb')
-    interpreter = PDFPageInterpreter(rsrcmgr, device)
-    
-    file_pages = PDFPage.get_pages(path)
-    nbPages = len(list(file_pages))
-    for page in PDFPage.get_pages(path):
-      interpreter.process_page(page)
-      t = retstr.getvalue()
-    # text = retstr.getvalue()
-
-    # fp.close()
-    device.close()
-    retstr.close()
-    return t, nbPages
+    return extract_text(path)
 
 temp_dir = tempfile.TemporaryDirectory()
 
@@ -174,10 +152,8 @@ with st.sidebar:
             else:
                 index.insert_nodes(parser.get_nodes_from_documents(new_documents))
 
-    st.markdown(html_temp.format("rgba(55, 53, 47, 0.16)"),unsafe_allow_html=True)
-    st.markdown("""
-    Made by [@mauropelucchi](https://www.linkedin.com/in/mauropelucchi) 
-    """)
+    st.markdown(html_temp.format("rgba(55, 53, 47, 0.16)"),
+                unsafe_allow_html=True)
     st.markdown(
         """
         <a href="https://www.linkedin.com/in/mauropelucchi" target="_blank">

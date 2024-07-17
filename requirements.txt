@@ -1,6 +1,6 @@
 streamlit
 openai
-pdfminer
+pdfminer.six
 llama-index
 llama-index-llms-openai
 nltk
