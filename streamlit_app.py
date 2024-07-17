@@ -1,5 +1,5 @@
 import streamlit as st
-import pymupdf
+import fitz
 import tempfile
 import pathlib
 import openai
@@ -109,15 +109,6 @@ def load_data(my_folder):
         st.text("Index is ready")
     return index
 
-@st.cache_data
-def convert_pdf_to_txt_file(path):
-    text = ""
-    doc = pymupdf.open(path)
-    for page in doc:
-        text = text + "\n" + page.get_text()
-
-temp_dir = tempfile.TemporaryDirectory()
-
 with st.sidebar:
     st.title(":outbox_tray: Upload your documents")
 
@@ -135,11 +126,10 @@ with st.sidebar:
     if uploaded_files is not None:
         for uploaded_file in uploaded_files:
             bytes_data = uploaded_file.read()
-            uploaded_file_name = uploaded_file.name
-            uploaded_file_path = pathlib.Path(temp_dir.name) / uploaded_file_name
-            with open(uploaded_file_path, 'wb') as output_temporary_file:
-                output_temporary_file.write(uploaded_file.read())
-            text_data = convert_pdf_to_txt_file(uploaded_file_path)
+            text_data = ""
+            with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
+                for page in doc:
+                    text_data += page.getText()
             new_documents = [
                 Document(
                     text=text_data,
