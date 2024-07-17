@@ -1,7 +1,5 @@
 import streamlit as st
 import fitz
-import tempfile
-import pathlib
 import openai
 import requests
 from llama_index.llms.openai import OpenAI
@@ -128,7 +126,7 @@ with st.sidebar:
             text_data = ""
             with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
                 for page in doc:
-                    text_data += page.getText()
+                    text_data += page.get_textpage()
             new_documents = [
                 Document(
                     text=text_data,
