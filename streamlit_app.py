@@ -1,6 +1,5 @@
 import streamlit as st
-import pdfminer
-from pdfminer.high_level import extract_text
+import pdfminer.high_level
 import tempfile
 import pathlib
 import openai
