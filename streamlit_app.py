@@ -1,7 +1,8 @@
 import streamlit as st
+import tempfile
+import pathlib
 import openai
 import requests
-import json
 from llama_index.llms.openai import OpenAI
 import hmac
 from llama_index.core.node_parser import SimpleNodeParser
@@ -79,6 +80,17 @@ st.text("prepare literature review on labour market and artificial intelligence"
 st.text("prepare literature review on gpt and virtual assistant")
 
 openai.api_key = st.secrets.openai_key
+
+temp_dir = tempfile.TemporaryDirectory()
+st.write(temp_dir.name)
+
+uploaded_file = st.file_uploader("Upload a file")
+uploaded_file_name = "File_provided"
+uploaded_file_path = pathlib.Path(temp_dir.name) / uploaded_file_name
+
+if uploaded_file is not None:
+  with open(uploaded_file_path, 'wb') as output_temporary_file:
+    output_temporary_file.write(uploaded_file.read())
 
 
 if "messages" not in st.session_state.keys():
