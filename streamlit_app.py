@@ -11,8 +11,9 @@ from llama_index.core import VectorStoreIndex, \
                              Settings, \
                              StorageContext, \
                              Document
-import os
+import arxiv
 
+client = arxiv.Client()
 
 html_temp = """
             <div style="background-color:{};padding:1px">
@@ -42,6 +43,27 @@ def get_academic_papers_from_dblp(query: str):
                     text=hit['info']['title'],
                     metadata={"author": authors, "score": hit['@score']},
                 )
+        )
+    except:
+        pass
+    return feeds_summary
+
+def get_arxiv_documents(query):
+    feeds_summary = []
+    try:
+        search = arxiv.Search(
+            query = query,
+            max_results = 10,
+            sort_by = arxiv.SortCriterion.SubmittedDate
+        )
+        results = client.results(search)
+        for article in results:
+            authors = article.authors
+            feeds_summary.append(
+                    Document(
+                        text=article.summary,
+                        metadata={"author": authors, "title": article.title},
+                    )
         )
     except:
         pass
@@ -208,6 +230,7 @@ if st.session_state.messages[-1]["role"] != "assistant":
                 for response in response_text.split('####'):
                     st.text(f"Downloading new relevant documents about {response}...")
                     new_documents = get_academic_papers_from_dblp(response)
+                    new_documents.extend(get_arxiv_documents(response))
                     st.text("Adding new docs to the existing index...")
                     index.insert_nodes(parser.get_nodes_from_documents(new_documents))
             response_stream = st.session_state.chat_engine.stream_chat(prompt)
