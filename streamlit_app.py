@@ -50,25 +50,22 @@ def get_academic_papers_from_dblp(query: str):
 
 def get_arxiv_documents(query):
     feeds_summary = []
-    try:
-        search = arxiv.Search(
-            query = query,
-            max_results = 10,
-            sort_by = arxiv.SortCriterion.SubmittedDate
-        )
-        results = client.results(search)
-        for article in results:
-            authors = ""
-            for author in article.authors:
-                authors = author.name + ", " + authors
-            feeds_summary.append(
-                    Document(
-                        text=article.summary,
-                        metadata={"author": authors, "title": article.title},
-                    )
-        )
-    except:
-        pass
+    search = arxiv.Search(
+        query = query,
+        max_results = 10,
+        sort_by = arxiv.SortCriterion.SubmittedDate
+    )
+    results = client.results(search)
+    for article in results:
+        authors = ""
+        for author in article.authors:
+            authors = author.name + ", " + authors
+        feeds_summary.append(
+                Document(
+                    text=article.summary,
+                    metadata={"author": authors, "title": article.title},
+                )
+    )
     return feeds_summary
 
 st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by LlamaIndex",
