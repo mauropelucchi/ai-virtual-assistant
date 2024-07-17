@@ -104,7 +104,7 @@ def load_data(my_folder):
 
 temp_dir = tempfile.TemporaryDirectory()
 # st.write(temp_dir.name)
-index = load_data(pathlib.Path(temp_dir.name))
+index = None
 
 uploaded_files = st.file_uploader("Upload your files", accept_multiple_files=True)
 
@@ -119,6 +119,9 @@ if uploaded_files is not None:
     st.text('Loading your data...')
     index = load_data(pathlib.Path(temp_dir.name))
     st.text('Preparing the engine...')
+    st.session_state.chat_engine = index.as_chat_engine(
+        chat_mode="condense_question", verbose=True, streaming=True
+    )
 
 
 if "messages" not in st.session_state.keys():
@@ -147,7 +150,7 @@ Settings.llm = OpenAI(
             """,
 )
 
-if "chat_engine" not in st.session_state.keys():  # Initialize the chat engine
+if "chat_engine" not in st.session_state.keys() and index != None:  # Initialize the chat engine
     st.session_state.chat_engine = index.as_chat_engine(
         chat_mode="condense_question", verbose=True, streaming=True
     )
