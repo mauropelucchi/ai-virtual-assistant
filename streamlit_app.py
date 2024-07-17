@@ -102,7 +102,7 @@ def check_password():
 if not check_password():
     st.stop()
 st.subheader("Welcome to the AI Virtual Assistant for Literature Review")
-st.text("The assistant is based on https://dblp.org/")
+st.text("The assistant is based on https://dblp.org/ and https://arxiv.org/")
 
 openai.api_key = st.secrets.openai_key
 
