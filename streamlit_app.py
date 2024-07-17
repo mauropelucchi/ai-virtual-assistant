@@ -118,7 +118,7 @@ if uploaded_files is not None:
     with open(uploaded_file_path, 'wb') as output_temporary_file:
         output_temporary_file.write(uploaded_file.read())
     st.text('Loading your data...')
-    index = load_data(pathlib.Path(temp_dir.name))
+    index = load_data(temp_dir.name)
     st.text('Preparing the engine...')
     st.session_state.chat_engine = index.as_chat_engine(
         chat_mode="condense_question", verbose=True, streaming=True
