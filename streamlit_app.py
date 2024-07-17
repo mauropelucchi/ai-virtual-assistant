@@ -156,7 +156,7 @@ if "messages" not in st.session_state.keys():
 st.text('Preparing the model...')
 Settings.llm = OpenAI(
             model="gpt-4",
-            temperature=0.2,
+            temperature=0.3,
             system_prompt="""You are my AI Virtual 
             Assistant to write literature review.
             Assume that all questions are related 
@@ -168,7 +168,11 @@ Settings.llm = OpenAI(
             Important: add an Introduction session
             Important: References
             Important: use an academic languages
-            Use all the documents in the index.
+            The process to write literature review is the following:
+            1) extract relevant terms
+            2) download documents
+            3) find 15 relevant papers
+            4) write the literature review
             """,
 )
 
