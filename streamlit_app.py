@@ -81,16 +81,44 @@ st.text("prepare literature review on gpt and virtual assistant")
 
 openai.api_key = st.secrets.openai_key
 
+@st.cache_resource(show_spinner=False)
+def load_data(my_folder):
+    st.text('Loading your data...')
+    with st.expander('See process'):
+        if not index_exists:
+            st.text("Loading new documents...")
+            docs = SimpleDirectoryReader(input_dir=my_folder).load_data()
+            number_of_documents = len(docs)
+            st.text(f"{number_of_documents} documents loaded")
+            st.text("Preparing the index...")
+            index = VectorStoreIndex.from_documents(docs, show_progress=True)
+            index.storage_context.persist(persist_dir="persist_directory")
+        else:
+            st.text("Loading the index...")
+            storage_context = StorageContext.from_defaults(persist_dir=persist_directory)
+            index = load_index_from_storage(storage_context)
+            docs = SimpleDirectoryReader(input_dir=my_folder).load_data()
+
+        st.text("Index is ready")
+    return index
+
 temp_dir = tempfile.TemporaryDirectory()
-st.write(temp_dir.name)
+# st.write(temp_dir.name)
+index = load_data(pathlib.Path(temp_dir.name))
 
-uploaded_file = st.file_uploader("Upload a file")
-uploaded_file_name = "File_provided"
-uploaded_file_path = pathlib.Path(temp_dir.name) / uploaded_file_name
+uploaded_files = st.file_uploader("Upload your files", accept_multiple_files=True)
 
-if uploaded_file is not None:
-  with open(uploaded_file_path, 'wb') as output_temporary_file:
-    output_temporary_file.write(uploaded_file.read())
+
+if uploaded_files is not None:
+  for uploaded_file in uploaded_files:
+    bytes_data = uploaded_file.read()
+    uploaded_file_name = uploaded_file.name
+    uploaded_file_path = pathlib.Path(temp_dir.name) / uploaded_file_name
+    with open(uploaded_file_path, 'wb') as output_temporary_file:
+        output_temporary_file.write(uploaded_file.read())
+    st.text('Loading your data...')
+    index = load_data(pathlib.Path(temp_dir.name))
+    st.text('Preparing the engine...')
 
 
 if "messages" not in st.session_state.keys():
@@ -118,30 +146,6 @@ Settings.llm = OpenAI(
             Important: use an academic languages
             """,
 )
-
-@st.cache_resource(show_spinner=False)
-def load_data():
-    with st.expander('See process'):
-        if not index_exists:
-            st.text("Loading new documents...")
-            docs = SimpleDirectoryReader(input_dir="./data").load_data()
-            number_of_documents = len(docs)
-            st.text(f"{number_of_documents} documents loaded")
-            st.text("Preparing the index...")
-            index = VectorStoreIndex.from_documents(docs, show_progress=True)
-            index.storage_context.persist(persist_dir="persist_directory")
-        else:
-            st.text("Loading the index...")
-            storage_context = StorageContext.from_defaults(persist_dir=persist_directory)
-            index = load_index_from_storage(storage_context)
-            docs = SimpleDirectoryReader(input_dir="./data").load_data()
-
-        st.text("Index is ready")
-    return index
-
-st.text('Loading your data...')
-index = load_data()
-st.text('Preparing the engine...')
 
 if "chat_engine" not in st.session_state.keys():  # Initialize the chat engine
     st.session_state.chat_engine = index.as_chat_engine(
