@@ -155,7 +155,7 @@ if "messages" not in st.session_state.keys():
 
 st.text('Preparing the model...')
 Settings.llm = OpenAI(
-            model="gpt-4",
+            model="gpt-4o",
             temperature=0.3,
             system_prompt="""You are my AI Virtual 
             Assistant to write literature review.
