@@ -138,7 +138,7 @@ with st.sidebar:
             text_data = ""
             with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
                 for page in doc:
-                    text_data += page.get_textpage()
+                    text_data += page.get_text()
             new_documents = [
                 Document(
                     text=text_data,
