@@ -139,10 +139,10 @@ with st.sidebar:
             uploaded_file_path = pathlib.Path(temp_dir.name) / uploaded_file_name
             with open(uploaded_file_path, 'wb') as output_temporary_file:
                 output_temporary_file.write(uploaded_file.read())
-            text_data_f, nbPages = convert_pdf_to_txt_file(uploaded_file_path)
+            text_data = convert_pdf_to_txt_file(uploaded_file_path)
             new_documents = [
                 Document(
-                    text=text_data_f,
+                    text=text_data,
                     metadata={},
                 )
             ]
