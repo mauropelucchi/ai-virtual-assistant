@@ -84,6 +84,7 @@ openai.api_key = st.secrets.openai_key
 @st.cache_resource(show_spinner=False)
 def load_data(my_folder):
     st.text('Loading your data...')
+    print(my_folder)
     with st.expander('See process'):
         if not index_exists:
             st.text("Loading new documents...")
