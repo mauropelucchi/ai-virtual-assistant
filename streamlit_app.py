@@ -1,4 +1,9 @@
 import streamlit as st
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfpage import PDFPage
+from io import StringIO
 import tempfile
 import pathlib
 import openai
@@ -13,6 +18,13 @@ from llama_index.core import VectorStoreIndex, \
                              StorageContext, \
                              Document
 import os
+
+
+html_temp = """
+            <div style="background-color:{};padding:1px">
+            
+            </div>
+            """
 
 def get_academic_papers_from_dblp(query: str):
     query = query.replace(" ", "+")
@@ -52,6 +64,7 @@ st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by L
                    menu_items=None)
 
 st.title("AI Virtual Assistant")
+parser = SimpleNodeParser()
 
 def check_password():
 
@@ -75,9 +88,6 @@ if not check_password():
     st.stop()
 st.subheader("Welcome to the AI Virtual Assistant for Literature Review")
 st.text("The assistant is based on https://dblp.org/")
-st.text("Example of prompts:")
-st.text("prepare literature review on labour market and artificial intelligence")
-st.text("prepare literature review on gpt and virtual assistant")
 
 openai.api_key = st.secrets.openai_key
 
@@ -103,26 +113,83 @@ def load_data(my_folder):
         st.text("Index is ready")
     return index
 
+# https://github.com/nainiayoub/pdf-text-data-extractor/blob/main/functions.py
+@st.cache_data
+def convert_pdf_to_txt_file(path):
+    texts = []
+    rsrcmgr = PDFResourceManager()
+    retstr = StringIO()
+    laparams = LAParams()
+    device = TextConverter(rsrcmgr, retstr, laparams=laparams)
+    # fp = open(path, 'rb')
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    
+    file_pages = PDFPage.get_pages(path)
+    nbPages = len(list(file_pages))
+    for page in PDFPage.get_pages(path):
+      interpreter.process_page(page)
+      t = retstr.getvalue()
+    # text = retstr.getvalue()
+
+    # fp.close()
+    device.close()
+    retstr.close()
+    return t, nbPages
+
 temp_dir = tempfile.TemporaryDirectory()
+
+with st.sidebar:
+    st.title(":outbox_tray: Upload your documents")
+
+    
+    st.markdown(html_temp.format("rgba(55, 53, 47, 0.16)"),unsafe_allow_html=True)
+    st.markdown("""
+    # How does it work?
+    Upload your documents and prompt your research topics
+                
+    Example of prompts:
+    - prepare literature review on labour market and artificial intelligence
+    - prepare literature review on gpt and virtual assistant
+    """)
+    uploaded_files = st.file_uploader("Upload your files", accept_multiple_files=True, type=['pdf'])
+    if uploaded_files is not None:
+        for uploaded_file in uploaded_files:
+            bytes_data = uploaded_file.read()
+            uploaded_file_name = uploaded_file.name
+            uploaded_file_path = pathlib.Path(temp_dir.name) / uploaded_file_name
+            with open(uploaded_file_path, 'wb') as output_temporary_file:
+                output_temporary_file.write(uploaded_file.read())
+            text_data_f, nbPages = convert_pdf_to_txt_file(uploaded_file_path)
+            new_documents = [
+                Document(
+                    text=text_data_f,
+                    metadata={},
+                )
+            ]
+            if index == None:
+                index = VectorStoreIndex.from_documents(new_documents, show_progress=False)
+                st.session_state.chat_engine = index.as_chat_engine(
+                    chat_mode="condense_question", verbose=True, streaming=True
+                )
+            else:
+                index.insert_nodes(parser.get_nodes_from_documents(new_documents))
+
+    st.markdown(html_temp.format("rgba(55, 53, 47, 0.16)"),unsafe_allow_html=True)
+    st.markdown("""
+    Made by [@mauropelucchi](https://www.linkedin.com/in/mauropelucchi) 
+    """)
+    st.markdown(
+        """
+        <a href="https://www.linkedin.com/in/mauropelucchi" target="_blank">
+        @ Mauro Pelucchi
+        </a>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 # st.write(temp_dir.name)
 index = None
-
-uploaded_files = st.file_uploader("Upload your files", accept_multiple_files=True)
-
-
-if uploaded_files is not None:
-  for uploaded_file in uploaded_files:
-    bytes_data = uploaded_file.read()
-    uploaded_file_name = uploaded_file.name
-    uploaded_file_path = pathlib.Path(temp_dir.name) / uploaded_file_name
-    with open(uploaded_file_path, 'wb') as output_temporary_file:
-        output_temporary_file.write(uploaded_file.read())
-    st.text('Loading your data...')
-    index = load_data(pathlib.Path(temp_dir.name))
-    st.text('Preparing the engine...')
-    st.session_state.chat_engine = index.as_chat_engine(
-        chat_mode="condense_question", verbose=True, streaming=True
-    )
 
 
 if "messages" not in st.session_state.keys():
