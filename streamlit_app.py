@@ -120,6 +120,18 @@ with st.sidebar:
     - prepare literature review on labour market and artificial intelligence
     - prepare literature review on gpt and virtual assistant
     """)
+    st.markdown(html_temp.format("rgba(55, 53, 47, 0.16)"),
+                unsafe_allow_html=True)
+    st.markdown(
+        """
+        <a href="https://www.linkedin.com/in/mauropelucchi" target="_blank">
+        @ Mauro Pelucchi
+        </a>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(html_temp.format("rgba(55, 53, 47, 0.16)"),
+                unsafe_allow_html=True)
     uploaded_files = st.file_uploader("Upload your files", accept_multiple_files=True, type=['pdf'])
     if uploaded_files is not None:
         for uploaded_file in uploaded_files:
@@ -140,17 +152,6 @@ with st.sidebar:
                 )
             else:
                 index.insert_nodes(parser.get_nodes_from_documents(new_documents))
-
-    st.markdown(html_temp.format("rgba(55, 53, 47, 0.16)"),
-                unsafe_allow_html=True)
-    st.markdown(
-        """
-        <a href="https://www.linkedin.com/in/mauropelucchi" target="_blank">
-        @ Mauro Pelucchi
-        </a>
-        """,
-        unsafe_allow_html=True,
-    )
 
 
 # st.write(temp_dir.name)
