@@ -125,7 +125,6 @@ with st.sidebar:
     uploaded_files = st.file_uploader("Upload your files", accept_multiple_files=True, type=['pdf'])
     if uploaded_files is not None:
         for uploaded_file in uploaded_files:
-            bytes_data = uploaded_file.read()
             text_data = ""
             with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
                 for page in doc:
