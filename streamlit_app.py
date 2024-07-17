@@ -47,10 +47,6 @@ def get_academic_papers_from_dblp(query: str):
         pass
     return feeds_summary
 
-persist_directory = './index'
-index_files = ['vector_store.json', 'docstore.json', 'index_store.json']
-index_exists = all(os.path.exists(os.path.join(persist_directory, file)) for file in index_files)
-
 st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by LlamaIndex",
                    page_icon="🔥",
                    layout="centered",
@@ -59,6 +55,7 @@ st.set_page_config(page_title="Chat with your AI Virtual Assistant, powered by L
 
 st.title("AI Virtual Assistant")
 parser = SimpleNodeParser()
+index = None
 
 def check_password():
 
