@@ -88,7 +88,7 @@ def load_data(my_folder):
     with st.expander('See process'):
         if not index_exists:
             st.text("Loading new documents...")
-            docs = SimpleDirectoryReader(input_dir=my_folder).load_data()
+            docs = SimpleDirectoryReader(input_dir="." + my_folder).load_data()
             number_of_documents = len(docs)
             st.text(f"{number_of_documents} documents loaded")
             st.text("Preparing the index...")
