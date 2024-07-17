@@ -58,7 +58,9 @@ def get_arxiv_documents(query):
         )
         results = client.results(search)
         for article in results:
-            authors = article.authors
+            authors = ""
+            for author in article.authors:
+                authors = author.name + ", " + authors
             feeds_summary.append(
                     Document(
                         text=article.summary,
